@@ -1,0 +1,56 @@
+#cloud-config
+hostname: nas
+users:
+- name: clayton
+  groups: sudo
+  shell: /usr/bin/fish
+  lock_passwd: true
+  ssh_authorized_keys:
+  # Replace with your github user and un-comment the line below:
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com"
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton"
+  # - github:clanktron
+
+ssh_pwauth: false
+
+timezone: US/Los_Angeles
+
+install:
+  # selects biggest drive
+  device: "auto"
+  reboot: true
+  poweroff: false
+  auto: true # Required, for automated installations
+
+  # Creates these dirs in the rootfs during installation. As the rootfs is RO from boot, sometimes we find that we
+  # some applications want to write to non-standard paths like /data
+  # If that dir is not already in the rootfs it makes it difficult to create that path on an RO system
+  # This allows to create some extra paths in the rootfs that then we count use for mounting or binding via
+  # the cloud-config stages
+  extra-dirs-rootfs:
+    - /data
+    - /src
+  # custom user mounts
+  # bind mounts, can be read and modified, changes persist reboots
+  bind_mounts:
+  - /git
+  - /services
+  # maybe
+  - /media
+  # # ephemeral mounts, can be read and modified, changed are discarded at reboot
+  # ephemeral_mounts:
+ 
+  # # Use a different container image for the installation
+  # image: "docker:.."
+  # # Add bundles in runtime
+  # bundles:
+
+# The reset block configures what happens when reset is called
+reset:
+  # Reboot after reset
+  reboot: true
+  # Power off after reset
+  poweroff: true
+
+# stages:
+#   rootfs:
