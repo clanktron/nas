@@ -1,5 +1,4 @@
 #cloud-config
-hostname: nas
 users:
 - name: clayton
   groups: sudo
@@ -12,7 +11,6 @@ users:
   # - github:clanktron
 
 ssh_pwauth: false
-
 timezone: US/Los_Angeles
 
 install:
@@ -52,5 +50,7 @@ reset:
   # Power off after reset
   poweroff: true
 
-# stages:
-#   rootfs:
+stages:
+  initramfs:
+    - name: "Setup hostname"
+      hostname: "node-{{ trunc 4 .MachineID }}"
