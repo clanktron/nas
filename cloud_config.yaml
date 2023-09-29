@@ -1,7 +1,7 @@
 #cloud-config
 users:
 - name: clayton
-  groups: sudo
+  groups: sudo, docker
   shell: /usr/bin/fish
   lock_passwd: true
   ssh_authorized_keys:
