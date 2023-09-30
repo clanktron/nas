@@ -9,16 +9,19 @@ users:
   - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com"
   - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton"
   # - github:clanktron
+- name: git
+  shell: /usr/bin/git-shell
+  lock_passwd: true
+  ssh_authorized_keys:
+  - github:clanktron
 
 ssh_pwauth: false
 timezone: US/Los_Angeles
 
 install:
-  # selects biggest drive
-  device: "auto"
   reboot: true
   poweroff: false
-  auto: true # Required, for automated installations
+  auto: false
 
   # Creates these dirs in the rootfs during installation. As the rootfs is RO from boot, sometimes we find that we
   # some applications want to write to non-standard paths like /data
@@ -27,14 +30,13 @@ install:
   # the cloud-config stages
   extra-dirs-rootfs:
     - /data
-    - /src
+    - /services
   # custom user mounts
   # bind mounts, can be read and modified, changes persist reboots
   bind_mounts:
-  - /git
+  - /home/git
   - /services
-  # maybe
-  - /media
+  - /data
   # # ephemeral mounts, can be read and modified, changed are discarded at reboot
   # ephemeral_mounts:
  
@@ -54,3 +56,19 @@ stages:
   initramfs:
     - name: "Setup hostname"
       hostname: "node-{{ trunc 4 .MachineID }}"
+  fs:
+    - name: "Import ZPool"
+      commands:
+      - zpool import rust
+    - name: "Dotfiles Setup"
+      directories:
+      - path: "/home/clayton/.config"
+        permissions: 0600
+        owner: clayton
+        group: clayton
+      git:
+        url: "https://github.com/clanktron/dotfiles"
+        path: "/tmp/dotfiles"
+        branch: "main"
+      commands:
+      - cd /tmp/dotfiles && USER=clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link
