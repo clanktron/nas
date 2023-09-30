@@ -3,7 +3,7 @@ FROM quay.io/kairos/core-ubuntu-22-lts:v2.4.0
 RUN apt update -y
 # && mkdir -p /var/cache/apt/archives/partial
 # General productivity utilities
-RUN apt install -y fish tmux neovim tree zoxide ripgrep fzf bat neofetch curl iperf speedtest-cli nmap iproute2 unzip
+RUN apt install -y git-all fish tmux neovim tree zoxide ripgrep fzf bat neofetch curl iperf speedtest-cli nmap iproute2 unzip
 #  TODO (packages not managed by apt): yazi 
 RUN echo /usr/bin/fish >> /etc/shells
 # System utilities
