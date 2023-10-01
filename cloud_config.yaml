@@ -1,27 +1,33 @@
 #cloud-config
+hostname: nas-{{ trunc 4 .MachineID }}
 users:
 - name: clayton
-  groups: sudo, docker
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  groups: [ docker ]
   shell: /usr/bin/fish
   lock_passwd: true
   ssh_authorized_keys:
-  # Replace with your github user and un-comment the line below:
-  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com"
-  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton"
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton
+  # can also just pull github keys
   # - github:clanktron
 - name: git
   shell: /usr/bin/git-shell
   lock_passwd: true
   ssh_authorized_keys:
-  - github:clanktron
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton
 
 ssh_pwauth: false
-timezone: US/Los_Angeles
+timezone: America/Los_Angeles
+
+# kairos debug logging
+debug: true
 
 install:
-  reboot: true
-  poweroff: false
-  auto: false
+  reboot: false
+  poweroff: true
+  auto: true
 
   # Creates these dirs in the rootfs during installation. As the rootfs is RO from boot, sometimes we find that we
   # some applications want to write to non-standard paths like /data
@@ -45,18 +51,21 @@ install:
   # # Add bundles in runtime
   # bundles:
 
+upgrade:
+  # Reboot after upgrade
+  reboot: true
+  # Power off after upgrade
+  poweroff: false
+
 # The reset block configures what happens when reset is called
 reset:
   # Reboot after reset
   reboot: true
   # Power off after reset
-  poweroff: true
+  poweroff: false
 
 stages:
-  initramfs:
-    - name: "Setup hostname"
-      hostname: "node-{{ trunc 4 .MachineID }}"
-  fs:
+  after-install:
     - name: "Import ZPool"
       commands:
       - zpool import rust
@@ -68,7 +77,7 @@ stages:
         group: clayton
       git:
         url: "https://github.com/clanktron/dotfiles"
-        path: "/tmp/dotfiles"
+        path: "/oem/dotfiles"
         branch: "main"
       commands:
-      - cd /tmp/dotfiles && USER=clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link
+      - cd /oem/dotfiles && USER=clayton HOME=/home/clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link
