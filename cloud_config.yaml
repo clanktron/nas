@@ -37,14 +37,13 @@ install:
   extra-dirs-rootfs:
     - /data
     - /services
+    - /scratch
   # custom user mounts
   # bind mounts, can be read and modified, changes persist reboots
-  bind_mounts:
-  - /home/git
-  - /services
-  - /data
+  # bind_mounts:
   # # ephemeral mounts, can be read and modified, changed are discarded at reboot
-  # ephemeral_mounts:
+  ephemeral_mounts:
+    - /scratch
  
   # # Use a different container image for the installation
   # image: "docker:.."
