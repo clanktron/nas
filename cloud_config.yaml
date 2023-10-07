@@ -2,7 +2,6 @@
 hostname: nas-{{ trunc 4 .MachineID }}
 users:
 - name: clayton
-  sudo: ALL=(ALL) NOPASSWD:ALL
   groups: [ docker ]
   shell: /usr/bin/fish
   lock_passwd: true
@@ -25,6 +24,7 @@ timezone: America/Los_Angeles
 debug: true
 
 install:
+  # install: /dev/sda
   reboot: false
   poweroff: true
   auto: true
@@ -64,19 +64,22 @@ reset:
   poweroff: false
 
 stages:
-  after-install:
-    - name: "Import ZPool"
+  fs:
+    # - name: "Import ZPool"
+    #   commands:
+    #   - zpool import -a
+    - name: "Ensure passwordless sudo"
       commands:
-      - zpool import rust
+        - echo "clayton ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     - name: "Dotfiles Setup"
       directories:
       - path: "/home/clayton/.config"
         permissions: 0600
-        owner: clayton
-        group: clayton
+        owner: 1000
+        group: 1000
       git:
         url: "https://github.com/clanktron/dotfiles"
-        path: "/oem/dotfiles"
+        path: "/scratch/dotfiles"
         branch: "main"
       commands:
-      - cd /oem/dotfiles && USER=clayton HOME=/home/clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link
+      - cd /scratch/dotfiles && USER=clayton HOME=/home/clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link
