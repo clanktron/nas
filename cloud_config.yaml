@@ -1,79 +1,88 @@
 #cloud-config
+debug: true
 hostname: nas-{{ trunc 4 .MachineID }}
-users:
-- name: clayton
-  groups: [ docker ]
-  shell: /usr/bin/fish
-  lock_passwd: true
-  ssh_authorized_keys:
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton
-  # can also just pull github keys
-  # - github:clanktron
-- name: git
-  shell: /usr/bin/git-shell
-  lock_passwd: true
-  ssh_authorized_keys:
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII0XOUB4lysCFKDxYspchE5MIGk+c4OOKWxQ4LNGPbPu clayton
-
+# fail on cloud config errors
+strict: true
+install:
+    ephemeral_mounts:
+        - /scratch
+    bind_mounts:
+        - /var/lib/docker
+    extra-dirs-rootfs:
+        - /data
+        - /services
+        - /scratch
+    poweroff: true
+    reboot: false
+reset:
+    poweroff: true
+    reboot: true
+    reset-persistent: false
+    reset-oem: false
+    ephemeral_mounts:
+        - /scratch
+    bind_mounts:
+        - /var/lib/docker
+    extra-dirs-rootfs:
+        - /data
+        - /services
+        - /scratch
+upgrade:
+    poweroff: true
+    reboot: true
+    bind_mounts:
+        - /var/lib/docker
+    ephemeral_mounts:
+        - /scratch
+    extra-dirs-rootfs:
+        - /data
+        - /services
+        - /scratch
 ssh_pwauth: false
 timezone: America/Los_Angeles
-
-# kairos debug logging
-debug: true
-
-install:
-  # install: /dev/sda
-  reboot: false
-  poweroff: true
-  auto: true
-
-  # Creates these dirs in the rootfs during installation. As the rootfs is RO from boot, sometimes we find that we
-  # some applications want to write to non-standard paths like /data
-  # If that dir is not already in the rootfs it makes it difficult to create that path on an RO system
-  # This allows to create some extra paths in the rootfs that then we count use for mounting or binding via
-  # the cloud-config stages
-  extra-dirs-rootfs:
-    - /data
-    - /services
-    - /scratch
-  # custom user mounts
-  # bind mounts, can be read and modified, changes persist reboots
-  # bind_mounts:
-  # # ephemeral mounts, can be read and modified, changed are discarded at reboot
-  ephemeral_mounts:
-    - /scratch
-  # # Use a different container image for the installation
-  # image: "docker:.."
-  # # Add bundles in runtime
-  # bundles:
-
-upgrade:
-  # Reboot after upgrade
-  reboot: true
-  # Power off after upgrade
-  poweroff: false
-
-# The reset block configures what happens when reset is called
-reset:
-  # Reboot after reset
-  reboot: true
-  # Power off after reset
-  poweroff: false
-
 stages:
-  fs:
-    - name: "Import ZPool"
-      commands:
-      - zpool import -af
-    - name: "Ensure passwordless sudo"
-      commands:
-        - echo "clayton ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-    - name: "Dotfiles Setup"
-      git:
-        url: "https://github.com/clanktron/dotfiles"
-        path: "/scratch/dotfiles"
-        branch: "main"
-      commands:
-        - cd /scratch && chown -R clayton:clayton dotfiles && cd dotfiles && su clayton -c "USER=clayton HOME=/home/clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link"
+    initramfs:
+      - name: "create base users"
+        users:
+         - name: clayton
+           groups:
+             - admin
+             - docker
+           lock_passwd: true
+           shell: /usr/bin/fish
+           ssh_authorized_keys:
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+         - name: test
+           groups:
+             - admin
+             - docker
+           lock_passwd: true
+           shell: /usr/bin/fish
+           ssh_authorized_keys:
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+         - name: git
+           lock_passwd: true
+           shell: /usr/bin/git-shell
+           ssh_authorized_keys:
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+    fs:
+      - name: Import ZPool
+        commands:
+          - zpool import -af
+      - name: mount data drive
+        commands:
+          - mount /dev/disk/by-id/ata-ST12000NM001G-2MV103_ZLW20B65 /data
+      - name: clone dotfiles
+        git:
+          branch: main
+          path: /scratch/dotfiles
+          url: https://github.com/clanktron/dotfiles
+      - name: install dotfiles
+        commands:
+          - chown -R test:test /scratch/dotfiles && cd /scratch/dotfiles && su test -c "HOME=/home/test XDG_CONFIG_HOME=/home/test/.config ./install link"
