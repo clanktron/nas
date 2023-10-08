@@ -44,7 +44,6 @@ install:
   # # ephemeral mounts, can be read and modified, changed are discarded at reboot
   ephemeral_mounts:
     - /scratch
- 
   # # Use a different container image for the installation
   # image: "docker:.."
   # # Add bundles in runtime
@@ -65,21 +64,16 @@ reset:
 
 stages:
   fs:
-    # - name: "Import ZPool"
-    #   commands:
-    #   - zpool import -a
+    - name: "Import ZPool"
+      commands:
+      - zpool import -af
     - name: "Ensure passwordless sudo"
       commands:
         - echo "clayton ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     - name: "Dotfiles Setup"
-      directories:
-      - path: "/home/clayton/.config"
-        permissions: 0600
-        owner: 1000
-        group: 1000
       git:
         url: "https://github.com/clanktron/dotfiles"
         path: "/scratch/dotfiles"
         branch: "main"
       commands:
-      - cd /scratch/dotfiles && USER=clayton HOME=/home/clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link
+        - cd /scratch && chown -R clayton:clayton dotfiles && cd dotfiles && su clayton -c "USER=clayton HOME=/home/clayton XDG_CONFIG_HOME=/home/clayton/.config ./install link"
