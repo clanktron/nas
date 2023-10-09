@@ -8,6 +8,7 @@ install:
         - /scratch
     bind_mounts:
         - /var/lib/docker
+        - /var/lib/tailscale
     extra-dirs-rootfs:
         - /data
         - /services
@@ -23,6 +24,7 @@ reset:
         - /scratch
     bind_mounts:
         - /var/lib/docker
+        - /var/lib/tailscale
     extra-dirs-rootfs:
         - /data
         - /services
@@ -32,6 +34,7 @@ upgrade:
     reboot: true
     bind_mounts:
         - /var/lib/docker
+        - /var/lib/tailscale
     ephemeral_mounts:
         - /scratch
     extra-dirs-rootfs:
@@ -71,6 +74,10 @@ stages:
              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+    network:
+      - name: "connect to tailscale"
+        commands:
+          - tailscale up
     fs:
       - name: Import ZPool
         commands:
