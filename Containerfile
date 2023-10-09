@@ -10,10 +10,17 @@ RUN echo /usr/bin/fish >> /etc/shells
 RUN apt install -y openssh-server ffmpeg 
 # OPTIONAL: intel-gpu-tools
 # Docker
-RUN apt install -y apt-transport-https ca-certificates software-properties-common && \
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
-apt update -y && apt-cache policy docker-ce && apt install -y docker-ce docker-buildx-plugin docker-compose-plugin
+RUN apt install -y apt-transport-https ca-certificates software-properties-common \
+&& curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+&& apt update -y \
+&& apt-cache policy docker-ce \
+&& apt install -y docker-ce docker-buildx-plugin docker-compose-plugin
+# Tailscale
+RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null \
+&& curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list \
+&& apt update -y \
+&& apt install -y tailscale
 # NAS utilities
 RUN apt install -y zfsutils-linux samba nfs-kernel-server nfs-common
 # Network GUI (maybe)
