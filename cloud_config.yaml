@@ -1,6 +1,34 @@
 #cloud-config
 debug: true
 hostname: nas-{{ trunc 4 .MachineID }}
+users:
+ - name: clayton
+   groups:
+     - admin
+     - docker
+   lock_passwd: true
+   shell: /usr/bin/fish
+   ssh_authorized_keys:
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+ - name: test
+   groups:
+     - admin
+     - docker
+   lock_passwd: true
+   shell: /usr/bin/fish
+   ssh_authorized_keys:
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+ - name: git
+   lock_passwd: true
+   shell: /usr/bin/git-shell
+   ssh_authorized_keys:
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+     - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
 # fail on cloud config errors
 # strict: true
 install:
@@ -44,36 +72,6 @@ upgrade:
 ssh_pwauth: false
 timezone: America/Los_Angeles
 stages:
-    initramfs:
-      - name: "create base users"
-        users:
-         - name: clayton
-           groups:
-             - admin
-             - docker
-           lock_passwd: true
-           shell: /usr/bin/fish
-           ssh_authorized_keys:
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
-         - name: test
-           groups:
-             - admin
-             - docker
-           lock_passwd: true
-           shell: /usr/bin/fish
-           ssh_authorized_keys:
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
-         - name: git
-           lock_passwd: true
-           shell: /usr/bin/git-shell
-           ssh_authorized_keys:
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
     network:
       - name: "export data drive"
         files:
@@ -101,3 +99,5 @@ stages:
             # - name: "connect to tailscale"
             #   commands:
             #     - tailscale up --authkey=$(cat /root/authkey)
+            # initramfs:
+            #   - name: "create base users"
