@@ -2,7 +2,7 @@
 debug: true
 hostname: nas-{{ trunc 4 .MachineID }}
 # fail on cloud config errors
-strict: true
+# strict: true
 install:
     ephemeral_mounts:
         - /scratch
@@ -75,9 +75,14 @@ stages:
              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
     network:
-      - name: "connect to tailscale"
-        commands:
-          - tailscale up
+      - name: "export data drive"
+        files:
+        - path: /etc/exports
+          content: |
+                    /data/media/ 100.64.0.0/10(ro,async,no_subtree_check)
+          permissions: 0640
+          owner: 0
+          group: 0
     fs:
       - name: Import ZPool
         commands:
@@ -93,3 +98,6 @@ stages:
       - name: install dotfiles
         commands:
           - chown -R test:test /scratch/dotfiles && cd /scratch/dotfiles && su test -c "HOME=/home/test XDG_CONFIG_HOME=/home/test/.config ./install link"
+            # - name: "connect to tailscale"
+            #   commands:
+            #     - tailscale up --authkey=$(cat /root/authkey)
