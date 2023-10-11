@@ -1,6 +1,6 @@
 #cloud-config
 debug: true
-hostname: nas-{{ trunc 4 .MachineID }}
+hostname: nas
 users:
  - name: clayton
    groups:
@@ -30,7 +30,7 @@ users:
      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
 # fail on cloud config errors
-# strict: true
+strict: false
 install:
     ephemeral_mounts:
         - /scratch
@@ -41,6 +41,7 @@ install:
         - /data
         - /services
         - /scratch
+        - /compose
     poweroff: true
     reboot: false
 reset:
@@ -57,6 +58,7 @@ reset:
         - /data
         - /services
         - /scratch
+        - /compose
 upgrade:
     poweroff: true
     reboot: true
@@ -69,6 +71,7 @@ upgrade:
         - /data
         - /services
         - /scratch
+        - /compose
 ssh_pwauth: false
 timezone: America/Los_Angeles
 stages:
@@ -88,6 +91,25 @@ stages:
       - name: mount data drive
         commands:
           - mount /dev/disk/by-id/ata-ST12000NM001G-2MV103_ZLW20B65 /data
+      - name: start vaultwarden
+        files:
+        - path: /compose/vaultwarden.yaml
+          content: |
+                    version: '3'
+                    services:
+                      vaultwarden:
+                        image: vaultwarden/vaultwarden:latest
+                        container_name: vaultwarden
+                        user: 1000:2000
+                        ports:
+                          - 3344:80
+                        volumes:
+                          - /services/vaultwarden/:/data
+          permissions: 0640
+          owner: 0
+          group: 0
+        commands:
+          - docker compose up -f /compose/vaultwarden.yaml -d
       - name: clone dotfiles
         git:
           branch: main
@@ -95,7 +117,7 @@ stages:
           url: https://github.com/clanktron/dotfiles
       - name: install dotfiles
         commands:
-          - chown -R test:test /scratch/dotfiles && cd /scratch/dotfiles && su test -c "HOME=/home/test XDG_CONFIG_HOME=/home/test/.config ./install link"
+          - chown -R test:test /scratch/dotfiles && su test -c "HOME=/home/test XDG_CONFIG_HOME=/home/test/.config ./install"
             # - name: "connect to tailscale"
             #   commands:
             #     - tailscale up --authkey=$(cat /root/authkey)
