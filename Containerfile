@@ -1,4 +1,4 @@
-FROM quay.io/kairos/core-ubuntu-22-lts:v2.4.0
+FROM quay.io/kairos/core-ubuntu-22-lts:v2.4.1
 # fix bug
 RUN apt update -y
 # && mkdir -p /var/cache/apt/archives/partial
