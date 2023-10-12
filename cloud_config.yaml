@@ -42,6 +42,7 @@ install:
         - /services
         - /scratch
         - /compose
+        - /s3
     poweroff: true
     reboot: false
 reset:
@@ -49,29 +50,29 @@ reset:
     reboot: true
     reset-persistent: false
     reset-oem: false
-    ephemeral_mounts:
-        - /scratch
-    bind_mounts:
-        - /var/lib/docker
-        - /var/lib/tailscale
-    extra-dirs-rootfs:
-        - /data
-        - /services
-        - /scratch
-        - /compose
+      # ephemeral_mounts:
+      #     - /scratch
+      # bind_mounts:
+      #     - /var/lib/docker
+      #     - /var/lib/tailscale
+      # extra-dirs-rootfs:
+      #     - /data
+      #     - /services
+      #     - /scratch
+      #     - /compose
 upgrade:
     poweroff: true
     reboot: true
-    bind_mounts:
-        - /var/lib/docker
-        - /var/lib/tailscale
-    ephemeral_mounts:
-        - /scratch
-    extra-dirs-rootfs:
-        - /data
-        - /services
-        - /scratch
-        - /compose
+      # bind_mounts:
+      #     - /var/lib/docker
+      #     - /var/lib/tailscale
+      # ephemeral_mounts:
+      #     - /scratch
+      # extra-dirs-rootfs:
+      #     - /data
+      #     - /services
+      #     - /scratch
+      #     - /compose
 ssh_pwauth: false
 timezone: America/Los_Angeles
 stages:
@@ -92,24 +93,8 @@ stages:
         commands:
           - mount /dev/disk/by-id/ata-ST12000NM001G-2MV103_ZLW20B65 /data
       - name: start vaultwarden
-        files:
-        - path: /compose/vaultwarden.yaml
-          content: |
-                    version: '3'
-                    services:
-                      vaultwarden:
-                        image: vaultwarden/vaultwarden:latest
-                        container_name: vaultwarden
-                        user: 1000:2000
-                        ports:
-                          - 3344:80
-                        volumes:
-                          - /services/vaultwarden/:/data
-          permissions: 0640
-          owner: 0
-          group: 0
         commands:
-          - docker compose up -f /compose/vaultwarden.yaml -d
+          - cd /services/vaultwarden && docker compose up -d
       - name: clone dotfiles
         git:
           branch: main
@@ -117,37 +102,7 @@ stages:
           url: https://github.com/clanktron/dotfiles
       - name: install dotfiles
         commands:
-          - chown -R test:test /scratch/dotfiles && su test -c "HOME=/home/test XDG_CONFIG_HOME=/home/test/.config ./install"
+          - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install"
             # - name: "connect to tailscale"
             #   commands:
             #     - tailscale up --authkey=$(cat /root/authkey)
-    initramfs:
-      - name: "create base users"
-        users:
-         - name: clayton
-           groups:
-             - "admin"
-             - "docker"
-           lock_passwd: true
-           shell: /usr/bin/fish
-           ssh_authorized_keys:
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
-         - name: test
-           groups:
-             - "admin"
-             - "docker"
-           lock_passwd: true
-           shell: /usr/bin/fish
-           ssh_authorized_keys:
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
-         - name: git
-           lock_passwd: true
-           shell: /usr/bin/git-shell
-           ssh_authorized_keys:
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
