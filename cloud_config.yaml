@@ -92,17 +92,28 @@ stages:
       - name: mount data drive
         commands:
           - mount /dev/disk/by-id/ata-ST12000NM001G-2MV103_ZLW20B65 /data
-      - name: start vaultwarden
-        commands:
-          - cd /services/vaultwarden && docker compose up -d
-      - name: clone dotfiles
-        git:
-          branch: main
-          path: /scratch/dotfiles
-          url: https://github.com/clanktron/dotfiles
-      - name: install dotfiles
-        commands:
-          - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install"
+
+      # This fails due to clayton user not existing? not sure what thats about
+      # - name: clone dotfiles
+      #   git:
+      #     branch: main
+      #     path: /scratch/dotfiles
+      #     url: https://github.com/clanktron/dotfiles
+      # - name: install dotfiles
+      #   commands:
+      #     - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install"
+            # - name: ensure clayton
+            #   ensure_entities:
+            #   -  path: /etc/passwd
+            #      entity: |
+            #              kind: "user"
+            #              username: "clayton"
+            #              password: "x"
+            #              uid: 0
+            #              gid: 0
+            #              info: "Foo!"
+            #              homedir: "/home/foo"
+            #              shell: "/bin/bash" 
             # - name: "connect to tailscale"
             #   commands:
             #     - tailscale up --authkey=$(cat /root/authkey)
