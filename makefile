@@ -1,7 +1,7 @@
 # CONTAINER_CLI=docker
 # CONTAINER_CLI=nerdctl
 CONTAINER_CLI=colima nerdctl --
-CONTAINER_TAG=clanktron/nas
+CONTAINER_TAG=quay.io/clanktron/nas
 COMMIT_HASH=$(shell git rev-parse HEAD)
 VERSION=0.1.1
 
@@ -15,7 +15,7 @@ container-release:
 
 .PHONY: container-push
 container-push: container
-	$(CONTAINER_CLI) push -t $(CONTAINER_TAG):$(COMMIT_HASH)
+	$(CONTAINER_CLI) push $(CONTAINER_TAG):$(COMMIT_HASH)
 
 .PHONY: clean
 clean:

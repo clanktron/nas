@@ -65,8 +65,10 @@ if qemu-system-x86_64 \
     info "VM started, ssh should be listening on port $HOSTPORT"
 else
     error "Failed to start VM, exiting..."
+    cleanup
     exit 1
 fi
+cleanup
 
     # -display none \
     # -daemonize && \

@@ -27,7 +27,6 @@ TAG=$(git rev-parse HEAD)
 IMAGE_NAME="${IMAGE_NAME:-quay.io/clanktron/nas}"
 IMAGE="${IMAGE:-$IMAGE_NAME:$TAG}"
 
-
 replaceTag() {
     FILE="$1"
     tmpfile=$(mktemp)
@@ -38,6 +37,7 @@ replaceTag() {
         error "Failed to update install image, exiting..." && exit 1
     fi
     cp "$tmpfile" "$FILE"
+    rm "$tmpfile"
 }
 
 replaceTag ./cloud-config/base.yaml
