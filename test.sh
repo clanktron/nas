@@ -25,37 +25,48 @@ error() {
 HASH=$(git rev-parse HEAD)
 DISK="kairos-test-$HASH.qcow2"
 HOSTPORT=60020
-ISO=../
+ISO=./nas-0.1.1.iso
+
+cleanup() {
+    rm "$DISK"
+}
 
 info "Creating VM disk for test machine"
-qemu-img create -f qcow2 "$DISK" 30G && \
-    info "Created disk" || \
-    error "Failed to create VM disk, exiting..." && exit 1
-
+if qemu-img create -f qcow2 "$DISK" 30G; then
+    info "Created disk"
+else
+    error "Failed to create VM disk, exiting..."
+    exit 1
+fi
 info "Starting VM, machine should boot from attached iso"
-qemu-system-x86_64 \
+if qemu-system-x86_64 \
     -m 4G \
     -smp 4 \
     -drive file="$DISK",format=qcow2,if=virtio \
     -cpu host \
     -machine type=q35,accel=hvf \
-    -nic user,hostfwd=tcp::"$HOSTPORT"-:22 \
-    -cdrom "$ISO" && \
-    info "VM started, host will poweroff when installer is finished" || \
-    error "Failed to start VM, exiting..." && exit 1
+    -nic user,hostfwd=tcp::"$HOSTPORT"-:22 -cdrom "$ISO"; then
+    info "VM started, host will poweroff when installer is finished"
+else
+    error "Failed to start VM, exiting..."
+    cleanup
+    exit 1
+fi
 info "Installer is finished, VM powered off"
-# now we wait for the ISO to finish installing :)
-#
-#
+
 info "Starting VM again, machine should boot from disk now"
-qemu-system-x86_64 \
+if qemu-system-x86_64 \
     -m 4G \
     -smp 4 \
     -drive file="$DISK",format=qcow2,if=virtio \
     -cpu host \
     -machine type=q35,accel=hvf \
-    -nic user,hostfwd=tcp::"$HOSTPORT"-:22 \
-    -display none \
-    -daemonize && \
-    info "VM started, ssh should be listening on port $HOSTPORT" || \
-    error "Failed to start VM, exiting..." && exit 1
+    -nic user,hostfwd=tcp::"$HOSTPORT"-:22; then
+    info "VM started, ssh should be listening on port $HOSTPORT"
+else
+    error "Failed to start VM, exiting..."
+    exit 1
+fi
+
+    # -display none \
+    # -daemonize && \
