@@ -1,16 +1,13 @@
 FROM quay.io/kairos/core-ubuntu-22-lts:v2.4.1
-# fix bug
+ARG VERSION
+# latest canonical updates
 RUN apt update -y
-# && mkdir -p /var/cache/apt/archives/partial
-# General productivity utilities
-RUN apt install -y git-all fish tmux neovim tree zoxide ripgrep fzf bat neofetch curl unzip
-# Networking
-RUN apt install -y iperf speedtest-cli nmap iproute2 ufw
+# install system packages
 #  TODO (packages not managed by apt): yazi 
+COPY ./packages.txt .
+RUN xargs -a packages.txt apt install -y && rm packages.txt
+# preferred shell
 RUN echo /usr/bin/fish >> /etc/shells
-# System utilities
-RUN apt install -y openssh-server ffmpeg 
-# OPTIONAL: intel-gpu-tools
 # Docker
 RUN apt install -y apt-transport-https ca-certificates software-properties-common \
 && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
@@ -23,12 +20,6 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | tee 
 && curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list \
 && apt update -y \
 && apt install -y tailscale
-# NAS utilities
-RUN apt install -y zfsutils-linux samba nfs-kernel-server nfs-common
-# Network GUI (maybe)
-# RUN apt install -y cockpit
 
-# Import zfs pool (not at build time, the config file thing at startup)
-
-RUN export VERSION="nas-0.1"
+RUN export VERSION="nas-$VERSION"
 RUN envsubst '${VERSION}' </etc/os-release
