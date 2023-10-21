@@ -14,3 +14,6 @@ CLI=docker # could be nerdctl/podman/etc
 VERSION=0.1.1
 "$CLI" run -it quay.io/clanktron/nas:"$VERSION" fish
 ```
+
+## TODO
+- ubuntu unminimize doesn't work
