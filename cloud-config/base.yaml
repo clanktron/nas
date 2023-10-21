@@ -54,6 +54,17 @@ stages:
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+    - name: really ensure users
+      ensure_entities:
+       -  path: /etc/passwd
+          entity: |
+                  kind: "user"
+                  username: "foobar"
+                  password: "x"
+                  uid: 4040
+                  gid: 4040
+                  homedir: "/home/foo"
+                  shell: "/usr/bin/fish"
   fs:
     # This fails due to clayton user not existing? not sure what thats about
     - name: install dotfiles
