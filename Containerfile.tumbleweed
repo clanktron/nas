@@ -1,0 +1,31 @@
+FROM quay.io/kairos/core-opensuse-tumbleweed:v2.4.1
+ARG VERSION
+# latest opensuse updates
+RUN zypper up -y
+# General productivity utilities
+#  TODO (packages not managed by zypper): yazi zoxide ripgrep bat yq 
+RUN zypper install -y git fish tmux neovim tree fzf neofetch curl unzip intel-gpu-tools mediainfo
+RUN echo /usr/bin/fish >> /etc/shells
+# Networking
+# TODO: ufw
+RUN zypper install -y iperf speedtest-cli nmap iproute2 
+# NAS utilities
+# RUN zypper install -y zfsutils-linux samba nfs-kernel-server nfs-common
+# System utilities
+# RUN zypper install -y openssh-server ffmpeg 
+# Docker
+# RUN zypper install -y zypper-transport-https ca-certificates software-properties-common \
+# && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+# && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/zypper/sources.list.d/docker.list > /dev/null \
+# && zypper update -y \
+# && zypper-cache policy docker-ce \
+# && zypper install -y docker-ce docker-buildx-plugin docker-compose-plugin
+# Tailscale
+# RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null \
+# && curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | tee /etc/zypper/sources.list.d/tailscale.list \
+# && zypper update -y \
+# && zypper install -y tailscale
+# Network GUI (maybe)
+# RUN zypper install -y cockpit
+RUN export VERSION="nas-$VERSION"
+RUN envsubst '${VERSION}' </etc/os-release
