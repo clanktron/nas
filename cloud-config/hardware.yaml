@@ -1,0 +1,17 @@
+stages:
+    fs:
+      - name: import all zpools
+        commands:
+          - zpool import -af
+      - name: mount data drive
+        commands:
+          - mount /dev/disk/by-id/ata-ST12000NM001G-2MV103_ZLW20B65 /data
+    network:
+      - name: export data drive
+        files:
+        - path: /etc/exports
+          content: |
+                    /data/media/ 100.64.0.0/10(ro,async,no_subtree_check)
+          permissions: 0640
+          owner: 0
+          group: 0

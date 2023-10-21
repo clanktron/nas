@@ -1,0 +1,94 @@
+#cloud-config
+debug: true
+hostname: nas
+# fail on cloud config errors
+strict: false
+install:
+    ephemeral_mounts:
+        - /scratch
+    bind_mounts:
+        - /var/lib/docker
+        - /var/lib/tailscale
+    extra-dirs-rootfs:
+        - /data
+        - /services
+        - /scratch
+        - /s3
+    poweroff: true
+    reboot: false
+ssh_pwauth: false
+timezone: America/Los_Angeles
+stages:
+    initramfs:
+      - name: ensure users
+        users:
+         - name: clayton
+           userid: 4000
+           groups:
+             - admin
+             - docker
+           lock_passwd: true
+           shell: /usr/bin/fish
+           ssh_authorized_keys:
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+         - name: test
+           userid: 4001
+           groups:
+             - admin
+             - docker
+           lock_passwd: true
+           shell: /usr/bin/fish
+           ssh_authorized_keys:
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+         - name: git
+           userid: 4002
+           lock_passwd: true
+           shell: /usr/bin/git-shell
+           ssh_authorized_keys:
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+    fs:
+      # This fails due to clayton user not existing? not sure what thats about
+      - name: install dotfiles
+        git:
+          branch: main
+          path: /scratch/dotfiles
+          url: https://github.com/clanktron/dotfiles
+        commands:
+          - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install" && echo "require('clayton.core')" > /home/clayton/.config/nvim/init.lua
+            # - name: "connect to tailscale"
+            #   commands:
+            #     - tailscale up --authkey=$(cat /root/authkey)
+reset:
+    poweroff: true
+    reboot: true
+    reset-persistent: false
+    reset-oem: false
+      # ephemeral_mounts:
+      #     - /scratch
+      # bind_mounts:
+      #     - /var/lib/docker
+      #     - /var/lib/tailscale
+      # extra-dirs-rootfs:
+      #     - /data
+      #     - /services
+      #     - /scratch
+      #     - /compose
+upgrade:
+    poweroff: true
+    reboot: true
+      # bind_mounts:
+      #     - /var/lib/docker
+      #     - /var/lib/tailscale
+      # ephemeral_mounts:
+      #     - /scratch
+      # extra-dirs-rootfs:
+      #     - /data
+      #     - /services
+      #     - /scratch
+      #     - /compose
