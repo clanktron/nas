@@ -23,7 +23,8 @@ error() {
 
 # test created kairos iso
 HASH=$(git rev-parse HEAD)
-DISK="kairos-test-$HASH.qcow2"
+TIME=$(date +%h-%m-%N)
+DISK="kairos-test-$HASH-$TIME.qcow2"
 HOSTPORT=60020
 ISO=./nas-0.1.1.iso
 
