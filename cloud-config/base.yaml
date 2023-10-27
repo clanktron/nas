@@ -9,14 +9,14 @@ users:
     groups:
       - admin
       - docker
-    passwd: mudlerfest
+    passwd: mudlermudlermudler
     shell: /usr/bin/fish
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
 install:
-  image: quay.io/clanktron/nas:5f1695b2397e61f18d6b1727275f868a06c84a9c
+  image: quay.io/clanktron/nas-ubuntu:5f1695b2397e61f18d6b1727275f868a06c84a9c
   ephemeral_mounts:
     - /scratch
   bind_mounts:
