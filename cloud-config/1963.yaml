@@ -1,0 +1,26 @@
+#cloud-config
+
+# https://github.com/kairos-io/kairos/issues/1963
+debug: true
+hostname: nas
+stages:
+  initramfs:
+    - name: ensure users
+      users:
+        clayton: 
+          passwd: clayton
+        git:
+          passwd: git
+install:
+  image: quay.io/clanktron/nas-ubuntu:latest
+  ephemeral_mounts:
+    - /scratch
+  bind_mounts:
+    - /var/lib/tailscale
+  extra-dirs-rootfs:
+    - /data
+    - /services
+    - /scratch
+    - /s3
+  poweroff: true
+  reboot: false
