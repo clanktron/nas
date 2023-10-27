@@ -16,7 +16,7 @@ users:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
 install:
-  image: quay.io/clanktron/nas:2914d436f2f4fae978efafed9fb52df6deb58cc3
+  image: quay.io/clanktron/nas:5f1695b2397e61f18d6b1727275f868a06c84a9c
   ephemeral_mounts:
     - /scratch
   bind_mounts:
