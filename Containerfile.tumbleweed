@@ -3,16 +3,17 @@ ARG VERSION
 # latest opensuse updates
 RUN zypper up -y
 # General productivity utilities
-#  TODO (packages not managed by zypper): yazi zoxide ripgrep bat yq 
-RUN zypper install -y git fish tmux neovim tree fzf neofetch curl unzip intel-gpu-tools mediainfo
+#  TODO (packages not managed by zypper): yazi zoxide ripgrep bat yq neofetch
+RUN zypper install -y git fish tmux neovim tree fzf curl unzip intel-gpu-tools mediainfo
 RUN echo /usr/bin/fish >> /etc/shells
 # Networking
 # TODO: ufw
 RUN zypper install -y iperf speedtest-cli nmap iproute2 
 # NAS utilities
-# RUN zypper install -y zfsutils-linux samba nfs-kernel-server nfs-common
+# TODO: ZFS
+RUN zypper install -y samba nfs-kernel-server nfs-client
 # System utilities
-# RUN zypper install -y openssh-server ffmpeg 
+RUN zypper install -y openssh-server ffmpeg
 # Docker
 # RUN zypper install -y zypper-transport-https ca-certificates software-properties-common \
 # && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
