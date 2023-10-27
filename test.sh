@@ -21,16 +21,31 @@ error() {
     echo "${red}[ ERROR ]${reset} ${light_red}$1${reset}"
 }
 
+cleanup() {
+    rm "$DISK"
+}
+
+find_available_port() {
+    start_port="$1"
+    end_port="$2"
+    for port in $(seq "$start_port" "$end_port"); do
+        if ! nc -z localhost "$port"; then
+            echo "$port"
+            return
+        fi
+    done
+    error "No available ports, exiting..."
+    exit 1
+}
+
 # test created kairos iso
 HASH=$(git rev-parse HEAD)
 TIME=$(date +%h-%m-%N)
 DISK="kairos-test-$HASH-$TIME.qcow2"
-HOSTPORT=60020
 ISO=./nas-0.1.1.iso
-
-cleanup() {
-    rm "$DISK"
-}
+PORT_RANGE_START=60000
+PORT_RANGE_END=60100
+HOSTPORT=$(find_available_port "$PORT_RANGE_START" "$PORT_RANGE_END")
 
 info "Creating VM disk for test machine"
 if qemu-img create -f qcow2 "$DISK" 30G; then
@@ -46,7 +61,7 @@ if qemu-system-x86_64 \
     -drive file="$DISK",format=qcow2,if=virtio \
     -cpu host \
     -machine type=q35,accel=hvf \
-    -nic user,hostfwd=tcp::"$HOSTPORT"-:22 -cdrom "$ISO"; then
+    -cdrom "$ISO"; then
     info "VM started, host will poweroff when installer is finished"
 else
     error "Failed to start VM, exiting..."
