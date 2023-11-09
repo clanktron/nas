@@ -9,6 +9,8 @@ stages:
       users:
         clayton: 
           passwd: clayton
+          groups:
+            - admin
           ssh_authorized_keys:
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
