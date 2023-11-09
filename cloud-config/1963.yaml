@@ -24,9 +24,10 @@ stages:
       git:
         branch: main
         path: /scratch/dotfiles
-        url: https://github.com/clanktron/dotfiles
-      commands:
-        - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install -l"
+        url: https://github.com/kubernetes/kubernetes
+
+          #     commands:
+          #       - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install -l"
 install:
   image: quay.io/clanktron/nas:0.1.2
   ephemeral_mounts:

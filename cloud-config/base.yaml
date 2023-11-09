@@ -1,38 +1,51 @@
-#cloud-config
+# cloud-config
 debug: true
+hostname: nas
 # fail on cloud config errors
 strict: false
+install:
+  image: quay.io/clanktron/nas-ubuntu:latest
+  ephemeral_mounts:
+    - /scratch
+  bind_mounts:
+    - /var/lib/tailscale
+  extra-dirs-rootfs:
+    - /data
+    - /services
+    - /scratch
+    - /s3
+  poweroff: true
+  reboot: false
+ssh_pwauth: false
+timezone: America/Los_Angeles
 stages:
   initramfs:
     - name: ensure users
       users:
-        clayton: 
+        clayton:
           passwd: clayton
           groups:
             - admin
+            - docker
           shell: /usr/bin/fish
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
         git:
-          passwd: git
-            #           ssh_authorized_keys:
-            #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-            #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-            #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
-            #         git:
-            #           shell: /usr/bin/git-shell
-            #           ssh_authorized_keys:
-            #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
-            #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
-            #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
-            #   fs:
-            #     - name: install dotfiles
-            #       git:
-            #         branch: main
-            #         path: /scratch/dotfiles
-            #         url: https://github.com/clanktron/dotfiles
-            #       commands:
-            #         - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install -l"
-ssh_pwauth: false
-timezone: America/Los_Angeles
+          shell: /usr/bin/git-shell
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+  fs:
+    - name: install dotfiles
+      git:
+        branch: main
+        path: /scratch/dotfiles
+        url: https://github.com/clanktron/dotfiles
+      commands:
+        - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install -l"
 reset:
   poweroff: true
   reboot: true
