@@ -8,6 +8,7 @@ stages:
     - name: ensure users
       users:
         clayton: 
+          shell: /usr/bin/fish
           passwd: clayton
           groups:
             - admin
