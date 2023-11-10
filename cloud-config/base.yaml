@@ -38,6 +38,19 @@ stages:
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTdQLlqHFSdRU4iYNTx4Dgl+BUKnmSeV1od4BCvot0 clayton@ClaytonsMacBookPro.socal.rr.com
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/1VzaIV0bnoIv//1FtbRSnwv5KE7KP/sgljykiqTLa mini
             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOz0v4rsoL7f/A118ry+wWPd68pcvhkxrd0ITi8feUKQ mb-air
+  boot:
+    - name: service configuration
+      systemctl:
+        enable:
+         - systemd-timesyncd
+         - cronie
+         - zfs-import-cache
+        mask:
+         - purge-kernels
+        disable:
+         - crond
+        start:
+         - cronie
   fs:
     - name: install dotfiles
       git:
