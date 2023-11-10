@@ -71,6 +71,7 @@ fi
 info "Installer is finished, VM powered off"
 
 info "Starting VM again, machine should boot from disk now"
+info "ssh should be listening on port $HOSTPORT after the system boots..."
 if qemu-system-x86_64 \
     -m 4G \
     -smp 4 \
@@ -78,7 +79,7 @@ if qemu-system-x86_64 \
     -cpu host \
     -machine type=q35,accel=hvf \
     -nic user,hostfwd=tcp::"$HOSTPORT"-:22; then
-    info "VM started, ssh should be listening on port $HOSTPORT"
+    info "VM shutdown successfully"
 else
     error "Failed to start VM, exiting..."
     cleanup
