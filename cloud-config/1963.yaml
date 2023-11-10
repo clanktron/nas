@@ -22,7 +22,7 @@ stages:
   network:
    - git:
       branch: main
-      path: /scratch/dotfiles
+      path: /home/clayton/dotfiles
       url: https://github.com/kubernetes/kubernetes
 
         #     commands:
