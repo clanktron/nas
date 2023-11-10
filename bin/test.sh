@@ -42,7 +42,7 @@ find_available_port() {
 HASH=$(git rev-parse HEAD)
 TIME=$(date +%h-%m-%N)
 DISK="kairos-test-$HASH-$TIME.qcow2"
-ISO=$PWD/iso/nas-0.1.1.iso
+ISO=$PWD/iso/nas-0.1.2.iso
 PORT_RANGE_START=60000
 PORT_RANGE_END=60100
 HOSTPORT=$(find_available_port "$PORT_RANGE_START" "$PORT_RANGE_END")

@@ -23,8 +23,7 @@ stages:
    - git:
       branch: main
       path: /home/clayton/dotfiles
-      url: https://github.com/kubernetes/kubernetes
-
+      url: https://github.com/clanktron/dotfiles
         #     commands:
         #       - chown -R clayton:clayton /scratch/dotfiles && su clayton -c "HOME=/home/clayton /scratch/dotfiles/install -l"
 install:
