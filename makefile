@@ -17,6 +17,10 @@ container:
 push:
 	$(CLI) push $(IMAGE)
 
+.PHONY: test
+test:
+	./bin/test.sh
+
 .PHONY: iso
 iso:
 	$(CLI) run -v $(PWD)/build:/tmp/auroraboot \
