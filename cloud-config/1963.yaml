@@ -19,7 +19,7 @@ stages:
         git:
           shell: /usr/bin/git-shell
           passwd: git
-  fs:
+  network:
    - git:
       branch: main
       path: /scratch/dotfiles
